@@ -27,7 +27,7 @@ func main() {
 			os.Getenv("ELASTIC_API_KEY"),
 		)
         // print currentActiveRules
-        fmt.Println("print currentActiveRules for debug:", currentRules)
+        // fmt.Println("print currentActiveRules for debug:", currentRules)
 
 		for _, rule := range currentRules.Rules {
 			if rule.ExecutionStatus.Status == "active" {
@@ -43,7 +43,8 @@ func main() {
 				)
 
                 // print currentAlert
-                fmt.Println("print currentAlert for debug:", currentAlert)
+                // fmt.Println("print currentAlert for debug:", currentAlert)
+
 				if len(currentAlert.Hits.Hits) > 0 {
 					hit := currentAlert.Hits.Hits[0]
 					if previousHitId[ruleId] != hit.HitId {
