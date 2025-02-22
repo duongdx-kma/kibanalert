@@ -15,6 +15,7 @@ func Notify(source alerts.Source) []error {
 	adapters := map[string]sendfunc{
 		"sendgrid": SendGrid,
 		"smtp":     SMTP,
+	    "teams":     SendToTeamsAlert,
 	}
 
 	for _, meth := range notifyMethods {
