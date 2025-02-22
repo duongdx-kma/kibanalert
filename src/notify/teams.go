@@ -8,8 +8,10 @@ import (
 	"kibanalert/alerts"
 	"net/http"
 	"os"
+	"time"
 )
 
+// TeamsMessage - Cấu trúc tin nhắn gửi đến Microsoft Teams
 type TeamsMessage struct {
 	Type        string        `json:"type"`
 	Attachments []Attachment `json:"attachments"`
@@ -40,7 +42,21 @@ type TextBlock struct {
 	Wrap  bool   `json:"wrap"`
 }
 
-// SendToTeamsAlert gửi cảnh báo đến Microsoft Teams Webhook
+// ConvertDateToTimezone to specified timezone
+func ConvertDateToTimezone(dateStr, timezone string) (string, error) {
+	loc, err := time.LoadLocation(timezone)
+	if err != nil {
+		return "", fmt.Errorf("invalid timezone: %v", err)
+	}
+	t, err := time.Parse(time.RFC3339, dateStr)
+	if err != nil {
+		return "", fmt.Errorf("invalid date format: %v", err)
+	}
+
+	return t.In(loc).Format("2006-01-02 15:04:05"), nil
+}
+
+// SendToTeamsAlert to Microsoft teams webhook
 func SendToTeamsAlert(source alerts.Source) error {
 	fmt.Println("DEBUG: Starting SendToTeamsAlert function")
 	fmt.Printf("DEBUG: Received alert: %+v\n", source)
@@ -49,6 +65,17 @@ func SendToTeamsAlert(source alerts.Source) error {
 	if webhookURL == "" {
 		fmt.Println("ERROR: Teams webhook URL is not set")
 		return errors.New("Teams webhook URL is not set")
+	}
+
+	timezone := os.Getenv("TIMEZONE")
+	if timezone == "" {
+		timezone = "UTC"
+	}
+
+	formattedDate, err := ConvertDateToTimezone(source.Date, timezone)
+	if err != nil {
+		fmt.Println("ERROR: Failed to convert date timezone:", err)
+		return err
 	}
 
 	message := TeamsMessage{
@@ -62,9 +89,10 @@ func SendToTeamsAlert(source alerts.Source) error {
 					Version: "1.4",
 					MSTeams: MSTeams{Width: "Full"},
 					Body: []TextBlock{
+						{Type: "TextBlock", Text: fmt.Sprintf("⚠️ Alert: %s", source.AlertId), Weight: "bolder", Size: "Large"},
 						{Type: "TextBlock", Text: fmt.Sprintf("ㆍ Service Name: %s", source.ServiceName), Wrap: true},
 						{Type: "TextBlock", Text: fmt.Sprintf("ㆍ Reason: %s", source.Reason), Wrap: true},
-						{Type: "TextBlock", Text: fmt.Sprintf("ㆍ Date: %s", source.Date), Wrap: true},
+						{Type: "TextBlock", Text: fmt.Sprintf("ㆍ Date: %s", formattedDate), Wrap: true},
 					},
 				},
 			},
