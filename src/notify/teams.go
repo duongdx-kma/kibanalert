@@ -58,8 +58,8 @@ func ConvertDateToTimezone(dateStr, timezone string) (string, error) {
 
 // SendToTeamsAlert to Microsoft teams webhook
 func SendToTeamsAlert(source alerts.Source) error {
-	fmt.Println("DEBUG: Starting SendToTeamsAlert function")
-	fmt.Printf("DEBUG: Received alert: %+v\n", source)
+	// fmt.Println("DEBUG: Starting SendToTeamsAlert function")
+	// fmt.Printf("DEBUG: Received alert: %+v\n", source)
 
 	webhookURL := os.Getenv("TEAMS_WEBHOOK_URL")
 	if webhookURL == "" {
@@ -104,7 +104,7 @@ func SendToTeamsAlert(source alerts.Source) error {
 		fmt.Println("ERROR: Failed to marshal JSON:", err)
 		return err
 	}
-	fmt.Println("DEBUG: JSON payload prepared:", string(jsonData))
+    // fmt.Println("DEBUG: JSON payload prepared:", string(jsonData))
 
 	req, err := http.NewRequest(http.MethodPost, webhookURL, bytes.NewBuffer(jsonData))
 	if err != nil {
@@ -121,7 +121,7 @@ func SendToTeamsAlert(source alerts.Source) error {
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("DEBUG: Response status code:", resp.StatusCode)
+	// fmt.Println("DEBUG: Response status code:", resp.StatusCode)
 	if resp.StatusCode != http.StatusOK {
 		fmt.Printf("ERROR: Teams webhook error: received status code %d\n", resp.StatusCode)
 		return fmt.Errorf("Teams webhook error: received status code %d", resp.StatusCode)

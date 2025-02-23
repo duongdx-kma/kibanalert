@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  kibanalert:
+    build: ./
+    image: kibanalert:latest
+    container_name: kibanalert
+    ports:
+      - "8080:8080"
+    environment:
+      KIBANA_URL: http://172.18.24.120:5601
+      ELASTIC_URL: http://172.18.24.120:9200
+      ELASTIC_API_KEY: NlJnOExaVUI2WG16d2puRWI4RkU6WnVhenp2WEZTakNvQmFKMmpObmMydw==
+      CONNECTOR_INDEX_NAME: sit-apm-alert
+      SCAN_INTERVAL: 60
+      DEBUG: 1
+      NOTIFY_METHODS: teams
+      TEAMS_WEBHOOK_URL: https://f88vn.webhook.office.com/webhookb2/f4ed5690-31f8-4765-9a99-a3e5b9a1f90a@d42f0ee9-8163-4eff-abeb-26a999241feb/IncomingWebhook/ee88cafb04714978abfe33aac8061edc/d4632611-45bc-4ce6-896f-90168be0c4b0/V2EbqVVQctmq3dnJ5r9rBaGZi952ieRZF7QglrUNSw3ik1
+      TIMEZONE: Asia/Ho_Chi_Minh
+    networks:
+      - alert-network
+
+networks:
+  alert-network:
+    driver: bridge
